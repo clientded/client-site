@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boutique Click & Collect</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-logo">🛒</span>
+        <div>
+          <h1>Click &amp; Collect</h1>
+          <p>Commandez en ligne, retirez en magasin.</p>
+        </div>
+      </div>
+      <button class="cart-toggle" id="cartToggle">
+        <span class="material-symbols-rounded">shopping_cart</span>
+        <span class="cart-badge" id="cartCount">0</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="intro-card">
+        <h2>Bienvenue dans notre boutique</h2>
+        <p>
+          Ajoutez vos produits au panier, validez la commande et récupérez-les en magasin avec un code
+          de retrait unique.
+        </p>
+      </section>
+
+      <section class="products-grid" id="productsList"></section>
+
+      <template id="productCardTemplate">
+        <article class="product-card">
+          <div class="product-visual">
+            <img class="product-image" alt="" />
+            <span class="product-placeholder"></span>
+          </div>
+          <div class="product-body">
+            <h3 class="product-title"></h3>
+            <p class="product-description"></p>
+            <div class="product-meta">
+              <span class="product-price"></span>
+              <span class="product-stock"></span>
+            </div>
+            <button type="button" class="add-to-cart">
+              <span class="material-symbols-rounded">add_shopping_cart</span>
+              Ajouter au panier
+            </button>
+          </div>
+        </article>
+      </template>
+    </main>
+
+    <aside class="cart-panel" id="cartPanel">
+      <header class="cart-header">
+        <h2>Mon panier</h2>
+        <button class="icon-button" id="cartClose">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="cart-content" id="cartContent">
+        <p class="cart-empty">Votre panier est vide.</p>
+      </div>
+      <footer class="cart-footer">
+        <div class="cart-total">
+          <span>Total estimé</span>
+          <strong id="cartTotal">0,00&nbsp;€</strong>
+        </div>
+        <button type="button" class="checkout-button" id="checkoutBtn">Valider la commande</button>
+      </footer>
+    </aside>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <div class="modal-overlay" id="checkoutModal">
+      <div class="modal">
+        <header class="modal-header">
+          <h3>Finaliser la commande</h3>
+          <button class="icon-button" id="checkoutClose">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </header>
+        <form id="checkoutForm" class="modal-form">
+          <label>
+            Nom complet
+            <input type="text" name="customer" placeholder="Ex. Alex Martin" required />
+          </label>
+          <label>
+            Email (confirmation)
+            <input type="email" name="email" placeholder="exemple@mail.com" required />
+          </label>
+          <label>
+            Notes pour le retrait
+            <textarea name="notes" rows="3" placeholder="Heure de retrait souhaitée, etc."></textarea>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="secondary" id="checkoutCancel">Annuler</button>
+            <button type="submit">Confirmer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmationModal">
+      <div class="modal">
+        <header class="modal-header">
+          <h3>Commande confirmée</h3>
+          <button class="icon-button" id="confirmationClose">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </header>
+        <div class="modal-body" id="confirmationContent"></div>
+        <div class="modal-actions single">
+          <button type="button" id="confirmationOk">Compris</button>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded"
+      defer
+    ></script>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
+

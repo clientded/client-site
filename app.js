@@ -638,6 +638,38 @@ function init() {
   if (clientSession) {
     renderAccountOrders();
   }
+  if (!state.products.length) {
+    state.products = [
+      {
+        id: "demo-espresso",
+        name: "Machine à café Espresso Pro",
+        sku: "DEMO-ESP-001",
+        price: 189.9,
+        stock: 8,
+        description: "Cafetière espresso avec mousseur intégré, idéale pour des boissons barista à la maison.",
+        createdAt: Date.now(),
+      },
+      {
+        id: "demo-blender",
+        name: "Blender Haute Performance",
+        sku: "DEMO-BLD-002",
+        price: 129.5,
+        stock: 12,
+        description: "Blender 1200W parfait pour smoothies, glaces pilées et préparations culinaires.",
+        createdAt: Date.now(),
+      },
+      {
+        id: "demo-lampe",
+        name: "Lampe connectée Ambiance",
+        sku: "DEMO-LMP-003",
+        price: 59.99,
+        stock: 20,
+        description: "Lampe LED avec contrôle via application mobile et multiples ambiances lumineuses.",
+        createdAt: Date.now(),
+      },
+    ];
+    renderProducts();
+  }
   attachEventListeners();
 }
 

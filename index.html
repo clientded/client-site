@@ -3,6 +3,232 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Click &amp; Collect - Boutique</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <div class="brand-logo">🛍️</div>
+        <div>
+          <h1>Click &amp; Collect</h1>
+          <p>Commandez en ligne, retirez en magasin.</p>
+        </div>
+      </div>
+      <nav class="site-nav">
+        <button type="button" class="nav-button" id="homeNav">
+          <span class="material-symbols-rounded">storefront</span>
+          Boutique
+        </button>
+        <button type="button" class="nav-button" id="accountToggle">
+          <span class="material-symbols-rounded">person</span>
+          <span id="accountLabel">Mon compte</span>
+        </button>
+        <button type="button" class="nav-button cart-button" id="cartToggle">
+          <span class="material-symbols-rounded">shopping_cart</span>
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <h2>Préparez votre retrait sans attendre.</h2>
+          <p>
+            Sélectionnez vos produits, choisissez le créneau qui vous arrange et récupérez votre
+            commande en présentant votre code de vérification.
+          </p>
+          <div class="hero-actions">
+            <button type="button" class="hero-button primary" id="heroShopBtn">
+              Voir les produits
+            </button>
+            <button type="button" class="hero-button secondary" id="heroAccountBtn">
+              Suivre ma commande
+            </button>
+          </div>
+        </div>
+        <div class="hero-highlight">
+          <div class="highlight-card">
+            <span class="material-symbols-rounded">inventory_2</span>
+            <h3>Vos produits favoris</h3>
+            <p>Même catalogue que le magasin, mis à jour en temps réel.</p>
+          </div>
+          <div class="highlight-card">
+            <span class="material-symbols-rounded">verified</span>
+            <h3>Code de retrait sécurisé</h3>
+            <p>Un code unique permet de vérifier votre identité au comptoir.</p>
+          </div>
+          <div class="highlight-card">
+            <span class="material-symbols-rounded">update</span>
+            <h3>Suivi du statut</h3>
+            <p>Consultez l’avancement de votre commande dans votre espace client.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="products-grid" id="productsList"></section>
+    </main>
+
+    <aside class="cart-panel" id="cartPanel">
+      <header class="cart-header">
+        <h2>Mon panier</h2>
+        <button class="icon-button" id="cartClose">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="cart-content" id="cartContent">
+        <p class="cart-empty">Votre panier est vide.</p>
+      </div>
+      <footer class="cart-footer">
+        <div class="cart-total">
+          <span>Total estimé</span>
+          <strong id="cartTotal">0,00&nbsp;€</strong>
+        </div>
+        <button type="button" class="checkout-button" id="checkoutBtn">Valider la commande</button>
+      </footer>
+    </aside>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <template id="productCardTemplate">
+      <article class="product-card">
+        <div class="product-visual">
+          <img class="product-image" alt="" />
+          <span class="product-placeholder"></span>
+        </div>
+        <div class="product-body">
+          <span class="product-stock"></span>
+          <h3 class="product-title"></h3>
+          <p class="product-description"></p>
+          <div class="product-meta">
+            <span class="product-price"></span>
+            <button type="button" class="add-to-cart">
+              <span class="material-symbols-rounded">add_shopping_cart</span>
+              Ajouter
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <div class="modal-overlay" id="authModal">
+      <div class="modal auth-modal">
+        <header class="modal-header">
+          <h3>Connexion à l’espace client</h3>
+          <button class="icon-button" id="authClose">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </header>
+        <form id="authForm" class="modal-form">
+          <p>
+            En vous identifiant avec votre adresse email, vous pourrez retrouver vos commandes et
+            suivre leur statut.
+          </p>
+          <label>
+            Nom et prénom
+            <input type="text" name="name" placeholder="Ex. Alex Martin" required />
+          </label>
+          <label>
+            Adresse email
+            <input type="email" name="email" placeholder="exemple@mail.com" required />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="secondary" id="authCancel">Annuler</button>
+            <button type="submit">Continuer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="checkoutModal">
+      <div class="modal">
+        <header class="modal-header">
+          <h3>Finaliser la commande</h3>
+          <button class="icon-button" id="checkoutClose">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </header>
+        <form id="checkoutForm" class="modal-form">
+          <label>
+            Nom complet
+            <input type="text" name="customer" placeholder="Ex. Alex Martin" required />
+          </label>
+          <label>
+            Adresse email
+            <input type="email" name="email" placeholder="exemple@mail.com" required />
+          </label>
+          <label>
+            Notes pour le retrait
+            <textarea name="notes" rows="3" placeholder="Heure de retrait souhaitée, informations complémentaires..."></textarea>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="secondary" id="checkoutCancel">Annuler</button>
+            <button type="submit">Confirmer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmationModal">
+      <div class="modal">
+        <header class="modal-header">
+          <h3>Commande confirmée</h3>
+          <button class="icon-button" id="confirmationClose">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </header>
+        <div class="modal-body" id="confirmationContent"></div>
+        <div class="modal-actions single">
+          <button type="button" id="confirmationOk">Compris</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="accountModal">
+      <div class="modal account-modal">
+        <header class="modal-header account-header">
+          <div>
+            <h3>Espace client</h3>
+            <p id="accountSubtitle">Connectez-vous pour suivre vos commandes.</p>
+          </div>
+          <div class="account-actions">
+            <button type="button" class="secondary" id="logoutBtn">
+              <span class="material-symbols-rounded">logout</span>
+              Déconnexion
+            </button>
+            <button class="icon-button" id="accountClose">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
+        </header>
+        <div class="account-body" id="accountBody">
+          <p class="account-empty" id="accountEmpty">
+            Vous n’avez pas encore de commande. Ajoutez des produits à votre panier et validez votre
+            retrait !
+          </p>
+          <div class="account-orders hidden" id="accountOrders"></div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded"
+      defer
+    ></script>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Boutique Click & Collect</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -131,4 +357,5 @@
     <script src="app.js" type="module"></script>
   </body>
 </html>
+
 

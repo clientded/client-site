@@ -35,6 +35,10 @@
               Voir mon panier
               <span class="material-icons-outlined">shopping_bag</span>
             </button>
+            <button class="btn ghost" id="openTrackingShortcut">
+              Suivre ma commande
+              <span class="material-icons-outlined">qr_code</span>
+            </button>
           </div>
         </div>
         <div class="hero-visual">
@@ -195,7 +199,40 @@
         </div>
         <footer class="modal-footer">
           <button class="btn primary" id="confirmationDone">Compris, merci</button>
+          <button class="btn ghost" id="confirmationTrack">Suivre ma commande</button>
         </footer>
+      </div>
+    </div>
+
+    <div class="modal-backdrop hidden" id="trackingModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trackingTitle">
+        <header class="modal-header">
+          <div>
+            <h3 id="trackingTitle">Suivi de commande</h3>
+            <p>Saisissez le code de retrait reçu ainsi que votre e-mail.</p>
+          </div>
+          <button class="btn ghost icon" id="trackingClose" aria-label="Fermer">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </header>
+        <form id="trackingForm" class="modal-body">
+          <label class="field">
+            <span>Code de retrait</span>
+            <input type="text" id="trackingCode" name="code" required />
+          </label>
+          <label class="field">
+            <span>E-mail</span>
+            <input type="email" id="trackingEmail" name="email" required />
+          </label>
+          <footer class="modal-footer">
+            <button type="button" class="btn ghost" id="trackingCancel">Annuler</button>
+            <button type="submit" class="btn primary">
+              Consulter
+              <span class="material-icons-outlined">travel_explore</span>
+            </button>
+          </footer>
+        </form>
+        <div class="tracking-result hidden" id="trackingResult"></div>
       </div>
     </div>
 

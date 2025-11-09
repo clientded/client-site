@@ -14,6 +14,7 @@ const elements = {
   checkoutBtn: document.getElementById("checkoutBtn"),
   closeCart: document.getElementById("closeCart"),
   openCartShortcut: document.getElementById("openCartShortcut"),
+  openTrackingShortcut: document.getElementById("openTrackingShortcut"),
   scrollToCatalog: document.getElementById("scrollToCatalog"),
   catalogSection: document.getElementById("catalog"),
   storeMetricProducts: document.getElementById("storeMetricProducts"),
@@ -28,9 +29,15 @@ const elements = {
   confirmationModal: document.getElementById("confirmationModal"),
   confirmationClose: document.getElementById("confirmationClose"),
   confirmationDone: document.getElementById("confirmationDone"),
+  confirmationTrack: document.getElementById("confirmationTrack"),
   confirmationCode: document.getElementById("confirmationCode"),
   confirmationEmail: document.getElementById("confirmationEmail"),
   confirmationList: document.getElementById("confirmationList"),
+  trackingModal: document.getElementById("trackingModal"),
+  trackingForm: document.getElementById("trackingForm"),
+  trackingClose: document.getElementById("trackingClose"),
+  trackingCancel: document.getElementById("trackingCancel"),
+  trackingResult: document.getElementById("trackingResult"),
 };
 
 const DEFAULT_PRODUCTS = [
@@ -109,6 +116,7 @@ const state = {
     discount: 0,
     total: 0,
   },
+  orders: [],
 };
 
 function loadAdminProducts() {
@@ -140,6 +148,7 @@ function loadClientState() {
     if (!stored) return;
     const parsed = JSON.parse(stored);
     state.cart = Array.isArray(parsed.cart) ? parsed.cart : [];
+    state.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
   } catch (error) {
     console.warn("Impossible de charger l'état client :", error);
   }
@@ -148,6 +157,7 @@ function loadClientState() {
 function saveClientState() {
   const payload = {
     cart: state.cart,
+    orders: state.orders,
   };
   window.localStorage.setItem(CLIENT_STATE_KEY, JSON.stringify(payload));
 }
@@ -422,6 +432,120 @@ function generateCode() {
     .replace(/I/g, "1");
 }
 
+function formatStatus(status) {
+  const dictionary = {
+    "En préparation": "En préparation",
+    "En attente": "En attente",
+    "En cours de livraison": "En cours de livraison",
+    "Prêt pour retrait": "Prêt pour retrait",
+    "Remis au client": "Retrait effectué",
+    Livré: "Livré",
+    Annulé: "Annulée",
+  };
+  return dictionary[status] || status;
+}
+
+function renderTrackingResult(order) {
+  if (!elements.trackingResult) return;
+  if (!order) {
+    elements.trackingResult.innerHTML =
+      '<p class="tracking-empty">Aucune commande trouvée pour ce code et cet e-mail.</p>';
+    elements.trackingResult.classList.remove("hidden");
+    return;
+  }
+
+  const itemsList = order.items
+    ?.map(
+      (item) =>
+        `<li>${item.quantity ?? 0} × ${item.productName ?? "Produit"} (${formatCurrency(
+          (item.unitPrice ?? 0) * (item.quantity ?? 0),
+        )})</li>`,
+    )
+    .join("") ?? "";
+
+  const history =
+    order.history
+      ?.slice()
+      .sort((a, b) => b.date - a.date)
+      .map(
+        (entry) => `
+          <li>
+            <div class="tracking-step">
+              <span class="tracking-status">${formatStatus(entry.status)}</span>
+              <span class="tracking-date">${new Intl.DateTimeFormat("fr-FR", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(entry.date)}</span>
+            </div>
+            <p>${entry.note || ""}</p>
+          </li>
+        `,
+      )
+      .join("") ?? "";
+
+  elements.trackingResult.innerHTML = `
+    <div class="tracking-summary">
+      <div>
+        <span>Code retrait</span>
+        <strong>${order.reference}</strong>
+      </div>
+      <div>
+        <span>Statut actuel</span>
+        <strong>${formatStatus(order.status)}</strong>
+      </div>
+      <div>
+        <span>Total</span>
+        <strong>${formatCurrency(order.total ?? 0)}</strong>
+      </div>
+    </div>
+    <h4>Articles</h4>
+    <ul class="tracking-items">${itemsList}</ul>
+    <h4>Historique</h4>
+    <ul class="tracking-history">${history || "<li>Aucun suivi supplémentaire.</li>"}</ul>
+  `;
+  elements.trackingResult.classList.remove("hidden");
+}
+
+function findAdminOrder(reference, email) {
+  try {
+    const adminRaw = window.localStorage.getItem(STORAGE_KEY);
+    if (!adminRaw) return null;
+    const adminState = JSON.parse(adminRaw);
+    const orders = Array.isArray(adminState.orders) ? adminState.orders : [];
+    const match = orders
+      .slice()
+      .reverse()
+      .find(
+        (order) =>
+          (order.reference === reference || order.id === reference) &&
+          (!email || order.email?.toLowerCase() === email.toLowerCase()),
+      );
+    if (match) {
+      const existing = state.orders.find((item) => item.reference === match.reference);
+      if (existing) {
+        existing.status = match.status;
+        existing.total = match.total;
+        existing.updatedAt = Date.now();
+      } else {
+        state.orders.unshift({
+          reference: match.reference,
+          email: match.email,
+          name: match.customer,
+          status: match.status,
+          total: match.total,
+          createdAt: match.createdAt,
+          updatedAt: Date.now(),
+        });
+      }
+      saveClientState();
+    }
+    return match;
+  } catch (error) {
+    console.warn("Erreur lors de la lecture des commandes admin :", error);
+    return null;
+  }
+}
+
 function handleCheckoutSubmit(event) {
   event.preventDefault();
   const formData = new FormData(elements.checkoutForm);
@@ -448,6 +572,17 @@ function handleCheckoutSubmit(event) {
   closeModal(elements.checkoutModal);
   openModal(elements.confirmationModal);
 
+  state.orders.unshift({
+    reference: code,
+    email,
+    name,
+    createdAt: Date.now(),
+    total: state.totals.total,
+    status: "En préparation",
+  });
+
+  saveClientState();
+
   // Persist order in admin localStorage
   try {
     const adminStateRaw = window.localStorage.getItem(STORAGE_KEY);
@@ -469,6 +604,13 @@ function handleCheckoutSubmit(event) {
           unitPrice: line.price,
         })),
         total: state.totals.total,
+        history: [
+          {
+            status: "En préparation",
+            date: Date.now(),
+            note: "Commande réservée via site client.",
+          },
+        ],
       };
       adminState.orders = adminState.orders || [];
       adminState.orders.push(order);
@@ -527,6 +669,14 @@ function attachEventListeners() {
 
   elements.closeCart?.addEventListener("click", closeCart);
   elements.openCartShortcut?.addEventListener("click", openCart);
+  elements.openTrackingShortcut?.addEventListener("click", () => {
+    if (elements.trackingResult) {
+      elements.trackingResult.classList.add("hidden");
+      elements.trackingResult.innerHTML = "";
+    }
+    elements.trackingForm.reset();
+    openModal(elements.trackingModal);
+  });
   elements.scrollToCatalog?.addEventListener("click", () =>
     elements.catalogSection?.scrollIntoView({ behavior: "smooth" }),
   );
@@ -537,11 +687,36 @@ function attachEventListeners() {
   elements.confirmationModal?.addEventListener("click", (event) => {
     if (event.target === elements.confirmationModal) closeModal(elements.confirmationModal);
   });
+  elements.trackingModal?.addEventListener("click", (event) => {
+    if (event.target === elements.trackingModal) closeModal(elements.trackingModal);
+  });
+
+  elements.trackingClose?.addEventListener("click", () => closeModal(elements.trackingModal));
+  elements.trackingCancel?.addEventListener("click", () => closeModal(elements.trackingModal));
+  elements.trackingForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const code = elements.trackingForm.code.value.trim().toUpperCase();
+    const email = elements.trackingForm.email.value.trim();
+    const order = findAdminOrder(code, email);
+    renderTrackingResult(order);
+  });
+
+  elements.confirmationTrack?.addEventListener("click", () => {
+    closeModal(elements.confirmationModal);
+    if (elements.trackingResult) {
+      elements.trackingResult.classList.add("hidden");
+      elements.trackingResult.innerHTML = "";
+    }
+    elements.trackingForm.code.value = elements.confirmationCode.textContent;
+    elements.trackingForm.email.value = elements.confirmationEmail.textContent;
+    openModal(elements.trackingModal);
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeModal(elements.checkoutModal);
       closeModal(elements.confirmationModal);
+      closeModal(elements.trackingModal);
       closeCart();
     }
   });

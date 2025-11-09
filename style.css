@@ -382,6 +382,12 @@ body {
   border: 1px solid rgba(208, 162, 107, 0.18);
   display: grid;
   grid-template-rows: auto 1fr auto;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.cart-panel.open {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .cart-header {
@@ -627,6 +633,59 @@ body {
   gap: 8px;
   font-size: 14px;
   text-align: left;
+}
+
+.tracking-result {
+  display: grid;
+  gap: 18px;
+  padding: 8px 0;
+}
+
+.tracking-summary {
+  display: grid;
+  gap: 12px;
+  background: rgba(208, 162, 107, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+}
+
+.tracking-summary div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tracking-items,
+.tracking-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.tracking-step {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.tracking-status {
+  color: var(--accent-strong);
+}
+
+.tracking-date {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.tracking-empty {
+  margin: 0;
+  text-align: center;
+  color: var(--text-soft);
 }
 
 .hidden {

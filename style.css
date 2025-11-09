@@ -241,6 +241,7 @@ body {
   background: radial-gradient(circle at top right, rgba(208, 162, 107, 0.18), transparent 60%);
   opacity: 0;
   transition: inherit;
+  pointer-events: none;
 }
 
 .product-card:hover {

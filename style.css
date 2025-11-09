@@ -528,26 +528,6 @@ body {
   color: var(--text-soft);
 }
 
-.cart-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(55, 45, 35, 0.35);
-  z-index: 70;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.cart-overlay.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-body.modal-open,
-body.cart-open {
-  overflow: hidden;
-}
-
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -656,23 +636,11 @@ body.cart-open {
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;
-    padding-bottom: clamp(120px, 22vh, 220px);
   }
 
   .cart-panel {
-    position: fixed;
-    left: clamp(16px, 6vw, 28px);
-    right: clamp(16px, 6vw, 28px);
-    bottom: clamp(18px, 6vw, 28px);
-    max-height: 82vh;
-    width: auto;
-    transform: translateY(110%);
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
-    z-index: 90;
-  }
-
-  .cart-panel.open {
-    transform: translateY(0);
+    position: relative;
+    top: 0;
   }
 }
 

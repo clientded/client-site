@@ -3,6 +3,210 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrbisStore - Commande Click & Collect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div class="hero-content">
+          <span class="brand-chip">OrbisStore</span>
+          <h1>Commandez en ligne, retirez en boutique.</h1>
+          <p>
+            Composez votre panier parmi nos produits disponibles en temps réel. Un code de retrait
+            sécurisé vous est envoyé dès validation pour un retrait express.
+          </p>
+          <div class="hero-actions">
+            <button class="btn primary" id="scrollToCatalog">
+              Découvrir les produits
+              <span class="material-icons-outlined">arrow_downward</span>
+            </button>
+            <button class="btn ghost" id="openCartShortcut">
+              Voir mon panier
+              <span class="material-icons-outlined">shopping_bag</span>
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="orb"></div>
+          <div class="hero-card">
+            <span class="material-icons-outlined">verified_user</span>
+            <div>
+              <strong>Click & Collect</strong>
+              <small>Retrait prêt en moins de 2h ouvrées</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="catalog" id="catalog">
+          <header class="catalog-header">
+            <div>
+              <h2>Catalogue disponible</h2>
+              <p>Stocks synchronisés avec la caisse physique. Ajoutez, payez en magasin.</p>
+            </div>
+            <div class="catalog-actions">
+              <label class="field search-field">
+                <span class="material-icons-outlined">search</span>
+                <input type="search" id="searchInput" placeholder="Rechercher un produit ou une référence" />
+              </label>
+              <label class="field">
+                <span class="material-icons-outlined">tune</span>
+                <select id="sortSelect">
+                  <option value="featured">Mise en avant</option>
+                  <option value="price-asc">Prix croissant</option>
+                  <option value="price-desc">Prix décroissant</option>
+                  <option value="stock-desc">Stock le plus élevé</option>
+                </select>
+              </label>
+            </div>
+          </header>
+          <div id="productsGrid" class="products-grid"></div>
+        </section>
+
+        <aside class="cart-panel" id="cartPanel">
+          <header class="cart-header">
+            <div>
+              <h3>Mon panier</h3>
+              <p><span id="cartCount">0</span> article(s) sélectionné(s)</p>
+            </div>
+            <button class="btn ghost icon" id="closeCart">
+              <span class="material-icons-outlined">close</span>
+            </button>
+          </header>
+          <div class="cart-body" id="cartItems">
+            <p class="cart-empty">
+              Votre panier est vide. Ajoutez un article pour démarrer votre commande.
+            </p>
+          </div>
+          <footer class="cart-footer">
+            <div class="cart-summary">
+              <div>
+                <span>Sous-total</span>
+                <strong id="cartSubtotal">0,00 €</strong>
+              </div>
+              <div>
+                <span>Remise</span>
+                <strong id="cartDiscount">- 0,00 €</strong>
+              </div>
+              <div class="cart-total">
+                <span>Total estimé</span>
+                <strong id="cartTotal">0,00 €</strong>
+              </div>
+            </div>
+            <button class="btn primary" id="checkoutBtn" disabled>
+              Valider ma réservation
+              <span class="material-icons-outlined">lock</span>
+            </button>
+          </footer>
+        </aside>
+      </main>
+
+      <footer class="page-footer">
+        <div>
+          <strong>OrbisStore - Point de retrait</strong>
+          <p>Collecte sur présentation du code sécurisé envoyé après validation.</p>
+        </div>
+        <div class="footer-meta">
+          <span class="material-icons-outlined">location_on</span>
+          <p>15, rue du Futurisme, 75000 Paris</p>
+        </div>
+      </footer>
+    </div>
+
+    <div class="modal-backdrop hidden" id="checkoutModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+        <header class="modal-header">
+          <div>
+            <h3 id="checkoutTitle">Finaliser la réservation</h3>
+            <p>Renseignez vos coordonnées pour générer le code de retrait.</p>
+          </div>
+          <button class="btn ghost icon" id="checkoutClose" aria-label="Fermer">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </header>
+        <form id="checkoutForm" class="modal-body">
+          <label class="field">
+            <span>Nom complet</span>
+            <input type="text" id="customerName" name="name" required />
+          </label>
+          <label class="field">
+            <span>Adresse e-mail</span>
+            <input type="email" id="customerEmail" name="email" required />
+          </label>
+          <label class="field">
+            <span>Numéro de téléphone</span>
+            <input type="tel" id="customerPhone" name="phone" placeholder="+33 6 XX XX XX XX" />
+          </label>
+          <label class="field">
+            <span>Commentaire (optionnel)</span>
+            <textarea id="customerNotes" name="notes" rows="3" placeholder="Besoin particulier, heure de retrait…"></textarea>
+          </label>
+          <div class="modal-summary">
+            <div>
+              <span>Total</span>
+              <strong id="modalTotal">0,00 €</strong>
+            </div>
+            <div>
+              <span>Articles</span>
+              <strong id="modalItems">0</strong>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" class="btn ghost" id="checkoutCancel">Annuler</button>
+            <button type="submit" class="btn primary">
+              Générer le code
+              <span class="material-icons-outlined">verified</span>
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-backdrop hidden" id="confirmationModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
+        <header class="modal-header">
+          <div>
+            <h3 id="confirmationTitle">Réservation confirmée</h3>
+            <p>Présentez ce code lors du retrait pour récupérer votre commande.</p>
+          </div>
+          <button class="btn ghost icon" id="confirmationClose" aria-label="Fermer">
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </header>
+        <div class="modal-body confirmation">
+          <div class="confirmation-code" id="confirmationCode">—</div>
+          <p>
+            Un e-mail de confirmation a été envoyé à <span id="confirmationEmail">client@example.com</span> avec
+            le récapitulatif des articles.
+          </p>
+          <ul class="confirmation-list" id="confirmationList"></ul>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn primary" id="confirmationDone">Compris, merci</button>
+        </footer>
+      </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Click &amp; Collect - Boutique</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -357,5 +561,6 @@
     <script src="app.js" type="module"></script>
   </body>
 </html>
+
 
 

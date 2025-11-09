@@ -127,6 +127,51 @@ const state = {
   orders: [],
 };
 
+function renderOrdersBoard() {
+  if (!elements.ordersBoardList) return;
+  const orders = state.orders.slice(0, 6);
+  if (!orders.length) {
+    if (elements.ordersBoardEmpty && !elements.ordersBoardList.contains(elements.ordersBoardEmpty)) {
+      elements.ordersBoardList.innerHTML = "";
+      elements.ordersBoardList.appendChild(elements.ordersBoardEmpty);
+    }
+    elements.ordersBoardEmpty?.classList.remove("hidden");
+    return;
+  }
+
+  elements.ordersBoardEmpty?.classList.add("hidden");
+  const fragment = document.createDocumentFragment();
+  orders.forEach((order) => {
+    const card = document.createElement("article");
+    card.className = "orders-board-card";
+
+    const header = document.createElement("header");
+    const code = document.createElement("span");
+    code.textContent = order.reference;
+    const status = document.createElement("span");
+    status.className = "orders-board-status";
+    status.textContent = formatStatus(order.status || "En préparation");
+    header.append(code, status);
+
+    const meta = document.createElement("div");
+    meta.className = "orders-board-meta";
+    const total = document.createElement("span");
+    total.textContent = formatCurrency(order.total ?? 0);
+    const date = document.createElement("span");
+    date.textContent = new Intl.DateTimeFormat("fr-FR", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(order.updatedAt ?? order.createdAt ?? Date.now());
+    meta.append(total, date);
+
+    card.append(header, meta);
+    fragment.appendChild(card);
+  });
+
+  elements.ordersBoardList.innerHTML = "";
+  elements.ordersBoardList.appendChild(fragment);
+}
+
 function loadAdminProducts() {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -372,6 +417,7 @@ function renderCart() {
   elements.cartTotal.textContent = formatCurrency(totals.total);
   elements.checkoutBtn.disabled = !state.cart.length;
   updateMetrics();
+  renderOrdersBoard();
 }
 
 function addToCart(productId) {
@@ -463,6 +509,7 @@ function renderTrackingResult(order) {
     elements.trackingResult.innerHTML =
       '<p class="tracking-empty">Aucune commande trouvée pour ce code et cet e-mail.</p>';
     elements.trackingResult.classList.remove("hidden");
+    renderOrdersBoard();
     return;
   }
 
@@ -516,6 +563,7 @@ function renderTrackingResult(order) {
     <ul class="tracking-history">${history || "<li>Aucun suivi supplémentaire.</li>"}</ul>
   `;
   elements.trackingResult.classList.remove("hidden");
+  renderOrdersBoard();
 }
 
 function findAdminOrder(reference, email) {
@@ -589,11 +637,13 @@ function handleCheckoutSubmit(event) {
     email,
     name,
     createdAt: Date.now(),
+    updatedAt: Date.now(),
     total: state.totals.total,
     status: "En préparation",
   });
 
   saveClientState();
+  renderOrdersBoard();
 
   // Persist order in admin localStorage
   try {
@@ -724,6 +774,19 @@ function attachEventListeners() {
     openModal(elements.trackingModal);
   });
 
+  elements.ordersRefresh?.addEventListener("click", () => {
+    renderOrdersBoard();
+  });
+
+  elements.ordersOpenTracking?.addEventListener("click", () => {
+    if (elements.trackingResult) {
+      elements.trackingResult.classList.add("hidden");
+      elements.trackingResult.innerHTML = "";
+    }
+    elements.trackingForm.reset();
+    openModal(elements.trackingModal);
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeModal(elements.checkoutModal);
@@ -739,6 +802,7 @@ function init() {
   loadClientState();
   renderProducts();
   renderCart();
+  renderOrdersBoard();
   attachEventListeners();
 }
 

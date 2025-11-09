@@ -117,6 +117,30 @@
         </aside>
       </main>
 
+      <section class="orders-board" id="ordersBoard">
+        <header class="orders-board-header">
+          <div>
+            <h3>Mes commandes récentes</h3>
+            <p>Consultez instantanément les statuts de vos réservations.</p>
+          </div>
+          <div class="orders-board-actions">
+            <button class="btn ghost" id="ordersRefresh">
+              Actualiser
+              <span class="material-icons-outlined">refresh</span>
+            </button>
+            <button class="btn ghost" id="ordersOpenTracking">
+              saisir un code
+              <span class="material-icons-outlined">qr_code_2</span>
+            </button>
+          </div>
+        </header>
+        <div class="orders-board-body" id="ordersBoardList">
+          <p class="orders-board-empty" id="ordersBoardEmpty">
+            Vous n’avez pas encore de commande. Validez-en une ou utilisez « saisir un code ».
+          </p>
+        </div>
+      </section>
+
       <footer class="page-footer">
         <div>
           <strong>OrbisStore - Point de retrait</strong>
